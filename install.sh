@@ -814,7 +814,7 @@ if [ $doInstallSRM == true ]; then
 	flatpak override com.steamgriddb.steam-rom-manager --filesystem=host --user
 	flatpak override com.steamgriddb.steam-rom-manager --share=network --user
 	echo "#!/bin/sh
-	/usr/bin/flatpak run com.steamgriddb.steam-rom-manager" > "${toolsPath}"launchers/srm.sh
+	kill -9 `pidof steam` & /usr/bin/flatpak run com.steamgriddb.steam-rom-manager" > "${toolsPath}"launchers/srm.sh
 	chmod +x "${toolsPath}"launchers/srm.sh
 fi
 
