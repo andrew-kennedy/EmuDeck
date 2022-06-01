@@ -172,8 +172,9 @@ if [ "$doUninstall" == true ]; then
 		flatpak uninstall app.xemu.xemu
 		rm -rf ~/.var/app/app.xemu.xemu &>> /dev/null
 	fi
-	if [[ "$doUninstallSRM" == true ]]; then	
-		rm -rf ~/Desktop/Steam-ROM-Manager.AppImage &>> /dev/null
+	if [[ "$doUninstallSRM" == true ]]; then
+		flatpak uninstall com.steamgriddb.steam-rom-manager
+		rm -rf ~/.var/app/com.steamgriddb.steam-rom-manager &>> /dev/null
 	fi
 	if [[ "$doUninstallESDE" == true ]]; then
 		rm -rf ~/.emulationstation &>> /dev/null	
