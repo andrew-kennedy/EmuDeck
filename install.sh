@@ -809,21 +809,13 @@ fi
 #SRM Installation
 if [ $doInstallSRM == true ]; then
 	setMSG "${installString} Steam Rom Manager"
-	rm -f ~/Desktop/Steam-ROM-Manager-2.3.29.AppImage
-	rm -f ~/Desktop/Steam-ROM-Manager.AppImage
 	mkdir -p "${toolsPath}"/srm
-	curl -L "$(curl -s https://api.github.com/repos/SteamGridDB/steam-rom-manager/releases/latest | grep -E 'browser_download_url.*AppImage' | grep -ve 'i386' | cut -d '"' -f 4)" > "${toolsPath}"srm/Steam-ROM-Manager.AppImage
-	#Nova fix'
-	echo "#!/usr/bin/env xdg-open
-	[Desktop Entry]
-	Name=Steam Rom Manager
-	Exec=kill -9 `pidof steam` & ${toolsPath}srm/Steam-ROM-Manager.AppImage
-	Icon=steamdeck-gaming-return
-	Terminal=false
-	Type=Application
-	StartupNotify=false" > ~/Desktop/SteamRomManager.desktop
-	chmod +x ~/Desktop/SteamRomManager.desktop
-	chmod +x "${toolsPath}"/srm/Steam-ROM-Manager.AppImage
+	flatpak install flathub com.steamgriddb.steam-rom-manager -y --system
+	flatpak override com.steamgriddb.steam-rom-manager --filesystem=host --user
+	flatpak override com.steamgriddb.steam-rom-manager --share=network --user
+	echo "#!/bin/sh
+	/usr/bin/flatpak run com.steamgriddb.steam-rom-manager" > "${toolsPath}"launchers/srm.sh
+	chmod +x "${toolsPath}"launchers/srm.sh
 fi
 
 #Support for non-valve hardware.
@@ -1033,12 +1025,12 @@ fi
 
 if [ $doUpdateSRM == true ]; then
 	setMSG "Configuring Steam Rom Manager..."
-	mkdir -p ~/.config/steam-rom-manager/userData/
-	cp ~/dragoonDoriseTools/EmuDeck/configs/steam-rom-manager/userData/userConfigurations.json ~/.config/steam-rom-manager/userData/userConfigurations.json
+	mkdir -p ~/.var/app/com.steamgriddb.steam-rom-manager/config/steam-rom-manager/userData/
+	cp ~/dragoonDoriseTools/EmuDeck/configs/steam-rom-manager/userData/userConfigurations.json ~/.var/app/com.steamgriddb.steam-rom-manager/config/steam-rom-manager/userData/userConfigurations.json
 	sleep 3
-	sed -i "s|/run/media/mmcblk0p1/Emulation/roms/|${romsPath}|g" ~/.config/steam-rom-manager/userData/userConfigurations.json
-	sed -i "s|/run/media/mmcblk0p1/Emulation/tools/|${toolsPath}|g" ~/.config/steam-rom-manager/userData/userConfigurations.json
-	sed -i "s|/run/media/mmcblk0p1/Emulation/saves/|${savesPath}|g" ~/.config/steam-rom-manager/userData/userConfigurations.json
+	sed -i "s|/run/media/mmcblk0p1/Emulation/roms/|${romsPath}|g" ~/.var/app/com.steamgriddb.steam-rom-manager/config/steam-rom-manager/userData/userConfigurations.json
+	sed -i "s|/run/media/mmcblk0p1/Emulation/tools/|${toolsPath}|g" ~/.var/app/com.steamgriddb.steam-rom-manager/config/steam-rom-manager/userData/userConfigurations.json
+	sed -i "s|/run/media/mmcblk0p1/Emulation/saves/|${savesPath}|g" ~/.var/app/com.steamgriddb.steam-rom-manager/config/steam-rom-manager/userData/userConfigurations.json
 	echo -e "OK!"
 fi
 
@@ -1825,8 +1817,8 @@ zenity --question \
 ans=$?
 if [ $ans -eq 0 ]; then
 	kill -15 `pidof steam`
-	cd ${toolsPath}/srm
-	./Steam-ROM-Manager.AppImage
+	cd ${toolsPath}/launchers
+	./srm.sh
 	zenity --question \
 		 --title="EmuDeck" \
 		 --width=350 \
